@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run compile && mocha --compilers js:babel-core/register --timeout 15000",
     "test-travis": "npm run compile && node_modules/.bin/babel-node node_modules/.bin/babel-istanbul cover _mocha -- --compilers js:babel-core/register --timeout 15000",
-    "compile": "babel -d lib/ src/",
+    "compile": "babel -d lib/ src/ && cp src/storefronts.json lib/",
     "prepublish": "npm run compile"
   },
   "repository": {

@@ -6,6 +6,7 @@ const moment = require('moment');
 const P = require('bluebird');
 const parseXml = P.promisify(require('xml2js').parseString);
 const EventEmitter = require('events').EventEmitter;
+const availableStoreFronts = require('./storefronts.json');
 const firstPage = 0;
 
 
@@ -20,8 +21,18 @@ class Collector {
 			userAgent: 'iTunes/12.1.2 (Macintosh; OS X 10.10.3) AppleWebKit/0600.5.17',
 			delay: 1000,
 			maxRetries: 3,
+			storeFront: 'us',
 		};
+	
 		this.options = _.assign(defaults, options);
+
+		this.storeFrontId = String.prototype.toUpperCase.call(this.options.storeFront);
+		this.storeFrontId = availableStoreFronts[this.storeFrontId];
+
+		if (!this.storeFrontId) {
+			throw new Error(`storefront for country ${this.options.storeFront} not supported by Apple`);
+		}
+
 		this.apps = {};
 		if (_.isArray(apps)) {
 			_.forEach(apps, (appId) => {
@@ -103,7 +114,7 @@ class Collector {
 					uri: url,
 					headers: {
 						'User-Agent': self.options.userAgent,
-						'X-Apple-Store-Front': '143441-1',
+						'X-Apple-Store-Front': self.storeFrontId,
 						'X-Apple-Tz': '-14400',
 					},
 				});
